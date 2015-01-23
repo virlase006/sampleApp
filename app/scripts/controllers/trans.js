@@ -8,9 +8,9 @@
  * Controller of the sampleAppApp
  */
 angular.module('sampleAppApp')
-  .controller('TransCtrl', function (TransactionSvc,$scope,$http,$routeParams,$location) {
+  .controller('TransCtrl', function (getTransactionDetailSvc,TransactionSvc,$scope,$http,$routeParams,$location) {
      $scope.trans=[];
-  	 $http.get('data/'+$routeParams.acc+'transactions'+'.json').then(function(res1){
+  	getTransactionDetailSvc.getTransactions($routeParams.acc).then(function(res1){
       
       $scope.trans= res1.data;
       $scope.trans.date=Date.parse($scope.trans.date)

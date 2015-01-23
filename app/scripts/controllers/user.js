@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('sampleAppApp')
-  .controller('UserCtrl', function ($scope,$route,$http,$location) {
+  .controller('UserCtrl', function ($scope,$route,$http,$location,getUserDataSvc) {
     $scope.users=[];
-    $http.get('data/users.json').then(function(res){
+    getUserDataSvc.getUsers().then(function(res){
     	$scope.users = res.data;
     }, 
       function(res){

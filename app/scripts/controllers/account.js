@@ -8,10 +8,10 @@
  * Controller of the sampleAppApp
  */
 angular.module('sampleAppApp')
-  .controller('AccountCtrl', function ($scope,$http,$routeParams,$location) {
+  .controller('AccountCtrl', function (getAccountSvc,$scope,$http,$routeParams,$location) {
     $scope.accounts=[];
     $scope.ts=[{'tid':'145'}];
-    $http.get('../data/'+ $routeParams.acc +'.json').then(function(res){	
+    getAccountSvc.getAccount($routeParams.acc).then(function(res){	
 		  $scope.accounts = res.data;
        
       
