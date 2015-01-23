@@ -1,0 +1,19 @@
+<table class="table table-striped">
+	<h1>User Lists</h1>
+  <thead><tr>
+    <th>User Id</th>
+    <th>User Name</th>
+    <th>User Account</th>
+    <th>Account Details</th>
+    <th>Profile</th>
+  </tr></thead>
+  <tbody>
+<tr ng-repeat="user in users">
+<td>{{user.id}}</td>
+<td>{{user.name}}</td>
+<td>{{user.accountid}}</td>
+<td><button  class="btn" ng-click="getAcc(user)">Account </button></td>
+<td><button  class="btn" ng-click="getProfile(user)">Profile</button></td>
+
+
+</tr></ul>

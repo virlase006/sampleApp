@@ -1,0 +1,19 @@
+<table class="table table-striped">
+	 <h1> Account Information User</h1>
+  <thead><tr>
+    
+    <th>Account ID</th>
+    <th>Bank Name</th>
+  </tr></thead>
+
+
+
+<tbody></tbody>
+<tr ng-repeat='acc in accounts'>
+<td>{{acc.accountid}}</td>
+<td>{{acc.Bank}}</td>
+<td><button  class="btn" ng-click='getdetail(acc)' >transactions</button>
+</td>
+</tr>
+
+</table>

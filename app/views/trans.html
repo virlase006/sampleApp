@@ -1,0 +1,25 @@
+<table class="table table-striped">
+
+	 <h1> Transactions</h1>
+  <thead><tr>
+    
+    <th>Transaction ID</th>
+    <th>Transaction Type</th>
+    <th>Transaction Date</th>
+  </tr></thead>
+<tbody>
+  
+	<tr ng-repeat="tt in trans">
+	<td>{{tt.tid}}</td>
+	<td>{{tt.type}}</td>
+	<td>{{tt.date | dateFormat }}</td>
+	<td><button  class="btn" ng-click='delete(tt)'>Delete</button></td>
+</tbody>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3>Add New Transaction</h3>
+
+
+  <add-trans > </add-trans>

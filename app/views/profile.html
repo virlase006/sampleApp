@@ -1,0 +1,22 @@
+
+<table class="table table-striped" ng-controller='UserprofileCtrl as UP'>
+	<h1>User Lists</h1>
+  <thead><tr>
+    <th>User Id</th>
+    <th>User Name</th>
+    <th>Contact Number</th>
+    <th>Address</th>
+    <th>Profession</th>
+  </tr></thead>
+  <tbody>
+<tr ng-repeat="user in UP.profile">
+<td>{{user.id}}</td>
+<td>{{user.name}}</td>
+<td>{{user.ContactNumber}}</td>
+<td>{{user.Address}}</td>
+<td>{{user.Profession}}</td>
+
+
+
+
+</tr></ul>

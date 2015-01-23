@@ -1,0 +1,28 @@
+<form  class="form-horizontal"  name="myform" ng-submit="submitForm(myform.$valid)" novalidate  >
+
+		<div class="form-group">
+  <label class="col-sm-2 control-label">Transaction ID:</label>
+  <div class="col-sm-10">
+<input type='text' ng-model='tran.tid' placeholder="tID"required><br>
+</div>
+</div>
+		<div class="form-group">
+  <label class="col-sm-2 control-label">Transaction Type:</label>
+  <div class="col-sm-10">
+<select ng-model='tran.type'  required>
+<option ng-value='Withdraw'>WithDraw</option>
+<option ng-value='Deposite'>Deposit</option>
+
+</select>
+<br></div></div>
+		<div class="form-group">
+  <label class="col-sm-2 control-label">Transaction Date:</label>
+  <div class="col-sm-10">
+
+<input name='date' type="date" ng-model='tran.date' placeholder="mm/dd/yyyy" id='fdate'  required><br></div></div>
+  	 <div class="col-sm-offset-2 col-sm-10">
+<input class="btn" style="margin-right:20%" type='submit' ng-click='add(tran)' value='Add Transaction' ng-disabled='myform.$invalid'/>
+</div>
+
+
+	</form>
