@@ -1,22 +1,22 @@
-Write-Host "Enter Username & password to connect to Azure:"
-$USERNAME = Read-Host
-[System.Security.SecureString]$secureStringPassword = Read-Host -AsSecureString; 
-[String]$PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureStringPassword));
+#Write-Host "Enter Username & password to connect to Azure:"
+#$USERNAME = Read-Host
+#[System.Security.SecureString]$secureStringPassword = Read-Host -AsSecureString; 
+#[String]$PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureStringPassword));
 $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $USERNAME, $secureStringPassword
 az login -u $USERNAME -p $PASSWORD
 
-Write-Host "Enter Resource Group name to create:"
-$RESOURCEGROUP = Read-Host
+#Write-Host "Enter Resource Group name to create:"
+#$RESOURCEGROUP = Read-Host
 
-Write-Host "Enter Cluster name:"
-$CLUSTERNAME = Read-Host
+#Write-Host "Enter Cluster name:"
+#$CLUSTERNAME = Read-Host
 
-Write-Host "Enter Namespace:"
-$NAMESPACE = Read-Host
+#Write-Host "Enter Namespace:"
+#$NAMESPACE = Read-Host
 
 # Name to associate with public IP address
-Write-Host "Enter domain name to use:"
-$DNSNAME = Read-Host
+#Write-Host "Enter domain name to use:"
+#$DNSNAME = Read-Host
 
 <# 
 
@@ -34,8 +34,8 @@ Write-Host "Cluster created"  #>
 -------------------add a check to look at the status of cluster creation before moving further-------------
 #>
  
-az aks create --resource-group $RESOURCEGROUP --name $CLUSTERNAME --node-count 2 --enable-addons monitoring --l eastus -s Standard_D4s_v3 
-az aks get-credentials --resource-group $RESOURCEGROUP --name $CLUSTERNAME 
+#az aks create --resource-group $RESOURCEGROUP --name $CLUSTERNAME --node-count 2 --enable-addons monitoring --l eastus -s Standard_D4s_v3 
+az aks get-credentials --resource-group $RESOURCEGROUP --name $CLUSTERNAME --subscription 0658c1e6-74c9-4311-8207-62c4b33c5f10
 Write-Host "Fetched credentials" 
 
 kubectl create namespace $NAMESPACE
@@ -49,18 +49,13 @@ Write-Host "Postgres deployed"
 Write-Host "Connecting to azure RM account to gain access to azure key vault:"
 Connect-AzureRmAccount -Credential $credentials
 
-Write-Host "Enter VaultName"
-$VAULT = Read-Host
+
 $DockerUserName = (((Get-AzureKeyVaultSecret -VaultName $VAULT -Name DockerUserName).SecretValueText) -replace '\n' ,'')
 $DockerPassword = (((Get-AzureKeyVaultSecret -VaultName $VAULT -Name DockerPassword).SecretValueText) -replace '\n' ,'')
 
 kubectl create secret docker-registry regcred --docker-server=registry.rare-technologies.com:5050 --docker-username=$DockerUserName --docker-password=$DockerPassword -n $NAMESPACE
-Write-Host "Created docker-registry"
 
-Write-Host "Enter Username & password to connect to PII Tools:"
-$PIITOOLS_USERNAME = Read-Host
-[System.Security.SecureString]$secureStringValue = Read-Host -AsSecureString; 
-[String]$PIITOOLS_PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureStringValue));
+
 kubectl apply -f pii-tools-service.yaml -n $NAMESPACE
 ((Get-Content -path pii-tools-deployment.yaml -Raw) -replace 'USER_DEFINED_USERNAME', $PIITOOLS_USERNAME -replace 'USER_DEFINED_PASSWORD', $PIITOOLS_PASSWORD  -replace 'LICENSE_KEY_VALUE', $((Get-AzureKeyVaultSecret -VaultName $VAULT -Name LicenseKey).SecretValueText)) | Set-Content -Path pii-tools-deployment-$NAMESPACE.yaml
 
