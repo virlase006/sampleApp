@@ -2,14 +2,14 @@
 #$USERNAME = Read-Host
 #[System.Security.SecureString]$secureStringPassword = Read-Host -AsSecureString; 
 #[String]$PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureStringPassword));
-$PASSWORD=args[0]
-$USERNAME=args[1]
-$RESOURCEGROUP=args[2]
-$CLUSTERNAME=args[3]
-$NAMESPACE=args[4]
-$VAULT=args[5]
-$PIITOOLS_USERNAME=args[6]
-$PIITOOLS_PASSWORD=args[7]
+Param($PASSWORD,
+$USERNAME,
+$RESOURCEGROUP,
+$CLUSTERNAME,
+$NAMESPACE,
+$VAULT,
+$PIITOOLS_USERNAME,
+$PIITOOLS_PASSWORD)
 $securePassword = ConvertTo-SecureString -String $PASSWORD -AsPlainText -Force
 $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $USERNAME, $securePassword
 az login -u $USERNAME -p $PASSWORD
