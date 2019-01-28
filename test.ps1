@@ -46,13 +46,7 @@ Write-Host "Cluster created"  #>
 #az aks create --resource-group $RESOURCEGROUP --name $CLUSTERNAME --node-count 2 --enable-addons monitoring --l eastus -s Standard_D4s_v3 
 az aks get-credentials --resource-group $RESOURCEGROUP --name $CLUSTERNAME --subscription 0658c1e6-74c9-4311-8207-62c4b33c5f10
 Write-Host "Fetched credentials" 
-az aks install-cli
-$new_entry = 'C:\Users\VssAdministrator\.azure-kubectl'
-
-$old_path = [Environment]::GetEnvironmentVariable('path', 'machine');
-$new_path = $old_path + ';' + $new_entry
-[Environment]::SetEnvironmentVariable('path', $new_path,'Machine');
-
+choco install kubernetes-cli
 Write-Host $([Environment]::GetEnvironmentVariable('path', 'machine'))
 kubectl create namespace $NAMESPACE
 
