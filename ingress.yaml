@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: pii-tools-ingress
+spec:
+  tls:
+  - hosts:
+    - USER_DEFINED_DOMAIN.eastus.cloudapp.azure.com
+    secretName: pii-tools.tls
+  rules:
+  - host: USER_DEFINED_DOMAIN.eastus.cloudapp.azure.com
+    http:
+      paths:
+      - path:
+        backend:
+          serviceName: pii-tools
+          servicePort: 443

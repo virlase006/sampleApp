@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-config
+  labels:
+    app: postgres
+data:
+  POSTGRES_USER: pii_tools
+  POSTGRES_PASSWORD: 80c38f8f7f594803bbeb19f056530ac7
