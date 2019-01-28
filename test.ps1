@@ -2,9 +2,9 @@
 #$USERNAME = Read-Host
 #[System.Security.SecureString]$secureStringPassword = Read-Host -AsSecureString; 
 #[String]$PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureStringPassword));
-$securePassword = ConvertTo-SecureString -String $PASSWORD -AsPlainText -Force
+$securePassword = ConvertTo-SecureString -String $(env:PASSWORD) -AsPlainText -Force
 $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $USERNAME, $securePassword
-az login -u $USERNAME -p $PASSWORD
+az login -u $(env:USERNAME) -p $(env:PASSWORD)
 
 #Write-Host "Enter Resource Group name to create:"
 #$RESOURCEGROUP = Read-Host
