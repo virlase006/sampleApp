@@ -53,7 +53,7 @@ $old_path = [Environment]::GetEnvironmentVariable('path', 'machine');
 $new_path = $old_path + ';' + $new_entry
 [Environment]::SetEnvironmentVariable('path', $new_path,'Machine');
 
-Write-Host $env:path
+Write-Host $([Environment]::GetEnvironmentVariable('path', 'machine'))
 kubectl create namespace $NAMESPACE
 
 kubectl apply -f configMap.yaml -n $NAMESPACE
