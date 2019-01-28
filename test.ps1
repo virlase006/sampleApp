@@ -47,6 +47,7 @@ Write-Host "Cluster created"  #>
 az aks get-credentials --resource-group $RESOURCEGROUP --name $CLUSTERNAME --subscription 0658c1e6-74c9-4311-8207-62c4b33c5f10
 Write-Host "Fetched credentials" 
 az aks install-cli
+set PATH=%PATH%;C:\Users\VssAdministrator\.azure-kubectl
 kubectl create namespace $NAMESPACE
 
 kubectl apply -f configMap.yaml -n $NAMESPACE
