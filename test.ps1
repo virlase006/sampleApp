@@ -57,6 +57,7 @@ kubectl apply -f postgres-deployment.yaml -n $NAMESPACE
 Write-Host "Postgres deployed"
 
 Write-Host "Connecting to azure RM account to gain access to azure key vault:"
+Import-Module AzureRM
 Connect-AzureRmAccount -Credential $credentials
 
 
