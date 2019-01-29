@@ -12,6 +12,7 @@ $PIITOOLS_USERNAME,
 $PIITOOLS_PASSWORD)
 $securePassword = ConvertTo-SecureString -String $PASSWORD -AsPlainText -Force
 $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $USERNAME, $securePassword
+ls
 az login -u $USERNAME -p $PASSWORD
 
 #Write-Host "Enter Resource Group name to create:"
