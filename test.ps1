@@ -51,10 +51,10 @@ choco install kubernetes-cli
 Write-Host $([Environment]::GetEnvironmentVariable('path', 'machine'))
 kubectl create namespace $NAMESPACE
 
-kubectl apply -f configMap.yaml -n $NAMESPACE
-kubectl apply -f persistentVol.yaml -n $NAMESPACE
-kubectl apply -f postgres-service.yaml -n $NAMESPACE
-kubectl apply -f postgres-deployment.yaml -n $NAMESPACE
+kubectl apply -f ./_virlase006_sampleApp/configMap.yaml -n $NAMESPACE
+kubectl apply -f ./_virlase006_sampleApp/persistentVol.yaml -n $NAMESPACE
+kubectl apply -f ./_virlase006_sampleApp/postgres-service.yaml -n $NAMESPACE
+kubectl apply -f ./_virlase006_sampleApp/postgres-deployment.yaml -n $NAMESPACE
 Write-Host "Postgres deployed"
 
 Write-Host "Connecting to azure RM account to gain access to azure key vault:"
@@ -68,12 +68,12 @@ $DockerPassword = (((Get-AzureKeyVaultSecret -VaultName $VAULT -Name DockerPassw
 kubectl create secret docker-registry regcred --docker-server=registry.rare-technologies.com:5050 --docker-username=$DockerUserName --docker-password=$DockerPassword -n $NAMESPACE
 
 
-kubectl apply -f pii-tools-service.yaml -n $NAMESPACE
-((Get-Content -path pii-tools-deployment.yaml -Raw) -replace 'USER_DEFINED_USERNAME', $PIITOOLS_USERNAME -replace 'USER_DEFINED_PASSWORD', $PIITOOLS_PASSWORD  -replace 'LICENSE_KEY_VALUE', $((Get-AzureKeyVaultSecret -VaultName $VAULT -Name LicenseKey).SecretValueText)) | Set-Content -Path pii-tools-deployment-$NAMESPACE.yaml
+kubectl apply -f ./_virlase006_sampleApp/pii-tools-service.yaml -n $NAMESPACE
+((Get-Content -path pii-tools-deployment.yaml -Raw) -replace 'USER_DEFINED_USERNAME', $PIITOOLS_USERNAME -replace 'USER_DEFINED_PASSWORD', $PIITOOLS_PASSWORD  -replace 'LICENSE_KEY_VALUE', $((Get-AzureKeyVaultSecret -VaultName $VAULT -Name LicenseKey).SecretValueText)) | Set-Content -Path ./_virlase006_sampleApp/pii-tools-deployment-$NAMESPACE.yaml
 
 
 
-kubectl apply -f pii-tools-deployment-$NAMESPACE.yaml -n $NAMESPACE
+kubectl apply -f ./_virlase006_sampleApp/pii-tools-deployment-$NAMESPACE.yaml -n $NAMESPACE
 
 kubectl rollout status deployment/pii-tools -n $NAMESPACE -v9
 $STATUS = $?
@@ -91,10 +91,10 @@ az group delete -n $RESOURCEGROUP  --yes # you can use --no-wait option if you d
 else{
 Write-Host "PII Tools service deployed"
  
-kubectl apply -f ns-and-sa.yaml -n $NAMESPACE
+kubectl apply -f ./_virlase006_sampleApp/ns-and-sa.yaml -n $NAMESPACE
 Write-Host "Created service-account"
 
-kubectl apply -f loadbalancer.yaml -n $NAMESPACE
+kubectl apply -f ./_virlase006_sampleApp/loadbalancer.yaml -n $NAMESPACE
 
 Set-Variable -Name "IP" -Value $(kubectl get svc nginx-ingress --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}" -n $NAMESPACE)
 
@@ -114,29 +114,28 @@ $PUBLICIPID = az network public-ip list --query "[?ipAddress!=null]|[?contains(i
 # Update public ip address with DNS name
 az network public-ip update --ids $PUBLICIPID --dns-name $DNSNAME
 
-((Get-Content -path ./piitools-ingress-cert.yaml -Raw ) -replace 'TLS_CRT', $((Get-AzureKeyVaultSecret -VaultName $VAULT -Name base64crt).SecretValueText -replace '\n' , '')  -replace 'TLS_KEY' , $((Get-AzureKeyVaultSecret -VaultName $VAULT  -Name base64key).SecretValueText).Trim() -replace '\n' , '') |Set-Content -Path secret.yaml
-kubectl apply -f secret.yaml -n $NAMESPACE
+((Get-Content -path ./_virlase006_sampleApp/piitools-ingress-cert.yaml -Raw ) -replace 'TLS_CRT', $((Get-AzureKeyVaultSecret -VaultName $VAULT -Name base64crt).SecretValueText -replace '\n' , '')  -replace 'TLS_KEY' , $((Get-AzureKeyVaultSecret -VaultName $VAULT  -Name base64key).SecretValueText).Trim() -replace '\n' , '') |Set-Content -Path ./_virlase006_sampleApp/secret.yaml
+kubectl apply -f ./_virlase006_sampleApp/secret.yaml -n $NAMESPACE
 
 #Create a config map for customizing NGINX configuration
-kubectl apply -f nginx-config.yaml -n $NAMESPACE
+kubectl apply -f ./_virlase006_sampleApp/nginx-config.yaml -n $NAMESPACE
 Write-Host "Deployed nginx-config"
 
 #If RBAC is enabled in your cluster, create a cluster role and bind it to the service account
-((Get-Content -path rbac.yaml -Raw) -replace 'USER_DEFINED_NAMESPACE', $NAMESPACE) | Set-Content -Path rbac-$NAMESPACE.yaml
-kubectl apply -f rbac-$NAMESPACE.yaml -n $NAMESPACE
+((Get-Content -path ./_virlase006_sampleApp/rbac.yaml -Raw) -replace 'USER_DEFINED_NAMESPACE', $NAMESPACE) | Set-Content -Path ./_virlase006_sampleApp/rbac-$NAMESPACE.yaml
+kubectl apply -f ./_virlase006_sampleApp/rbac-$NAMESPACE.yaml -n $NAMESPACE
 Write-Host "Deployed rbac"
 
 #Deploy the Ingress Controller
-kubectl apply -f nginx-ingress.yaml -n $NAMESPACE
 Write-Host "Deployed nginx-ingress"
 
 #Deploy the Ingress 
-((Get-Content -path ingress.yaml -Raw) -replace 'USER_DEFINED_DOMAIN', $DNSNAME) | Set-Content -Path ingress-$DNSNAME.yaml
-kubectl apply -f ingress-$DNSNAME.yaml -n $NAMESPACE
+((Get-Content -path ./_virlase006_sampleApp/ingress.yaml -Raw) -replace 'USER_DEFINED_DOMAIN', $DNSNAME) | Set-Content -Path ./_virlase006_sampleApp/ingress-$DNSNAME.yaml
+kubectl apply -f ./_virlase006_sampleApp/ingress-$DNSNAME.yaml -n $NAMESPACE
 Write-Host "Deployed ingress"
 Write-Host "This may take few minutes, wait for sometime before accessing the URL..."
 } 
 #delete sensitive files
 
-Remove-Item -path secret.yaml
-Remove-Item -path pii-tools-deployment-$NAMESPACE.yaml
+Remove-Item -path ./_virlase006_sampleApp/secret.yaml
+Remove-Item -path ./_virlase006_sampleApp/pii-tools-deployment-$NAMESPACE.yaml
