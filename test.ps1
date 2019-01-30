@@ -109,12 +109,12 @@ Write-Host $IP
 #add hardening for infinite loop
 
 # Get the resource-id of the public ip
-$PUBLICIPID = $(az network public-ip list --query "[?ipAddress!=null]|[?contains(ipAddress, '$IP')].[id]" --output tsv)
+$PUBLICIPID = $(az network public-ip list --query "[?ipAddress!=null]|[?contains(ipAddress, '$IP')].[id]" --output tsv --subscription 0658c1e6-74c9-4311-8207-62c4b33c5f10)
 Write-Host "public ip for service is " 
 Write-Host $PUBLICIPID 
 Write-Host $DNSNAME
 # Update public ip address with DNS name
-az network public-ip update --ids $PUBLICIPID --dns-name $DNSNAME
+az network public-ip update --ids $PUBLICIPID --dns-name $DNSNAME --subscription 0658c1e6-74c9-4311-8207-62c4b33c5f10
 
 ((Get-Content -path ./_virlase006_sampleApp/piitools-ingress-cert.yaml -Raw ) -replace 'TLS_CRT', $((Get-AzureKeyVaultSecret -VaultName $VAULT -Name base64crt).SecretValueText -replace '\n' , '')  -replace 'TLS_KEY' , $((Get-AzureKeyVaultSecret -VaultName $VAULT  -Name base64key).SecretValueText).Trim() -replace '\n' , '') |Set-Content -Path ./_virlase006_sampleApp/secret.yaml
 kubectl apply -f ./_virlase006_sampleApp/secret.yaml -n $NAMESPACE
