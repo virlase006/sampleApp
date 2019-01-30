@@ -100,17 +100,16 @@ Set-Variable -Name "IP" -Value $(kubectl get svc nginx-ingress --template="{{ran
 $CheckUser = 0
 while($IP -eq $null){
 if($CheckUser -le '50'){
-  Write-Host "public ip " 
-  Write-Host $IP
   $CheckUser++
   start-sleep -s 10
   $IP = kubectl get svc nginx-ingress --template="{{range.status.loadBalancer.ingress}}{{.ip}}{{end}}" -n $NAMESPACE
   }
 }
+Write-Host $IP 
 #add hardening for infinite loop
 
 # Get the resource-id of the public ip
-$PUBLICIPID = az network public-ip list --query "[?ipAddress!=null]|[?contains(ipAddress, '$IP')].[id]" --output tsv
+$PUBLICIPID = $(az network public-ip list --query "[?ipAddress!=null]|[?contains(ipAddress, '$IP')].[id]" --output tsv)
 Write-Host "public ip for service is " 
 Write-Host $PUBLICIPID 
 Write-Host $DNSNAME
