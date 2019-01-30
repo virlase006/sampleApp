@@ -1,5 +1,5 @@
 #Write-Host "Enter Username & password to connect to Azure:"
-#$USERNAME = Read-Host
+#$USERNAME =-Host
 #[System.Security.SecureString]$secureStringPassword = Read-Host -AsSecureString; 
 #[String]$PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureStringPassword));
 Param($PASSWORD,
@@ -80,8 +80,6 @@ $STATUS = $?
 Write-Host $STATUS
 #check the rollout status and rollback if not successful- kubectl rollout status returns a non-zero exit code if the Deployment has exceeded the progression deadline.
 
-
-Read-Host
 
 
 if(!$STATUS){
