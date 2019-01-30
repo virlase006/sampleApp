@@ -69,7 +69,7 @@ kubectl create secret docker-registry regcred --docker-server=registry.rare-tech
 
 
 kubectl apply -f ./_virlase006_sampleApp/pii-tools-service.yaml -n $NAMESPACE
-((Get-Content -path pii-tools-deployment.yaml -Raw) -replace 'USER_DEFINED_USERNAME', $PIITOOLS_USERNAME -replace 'USER_DEFINED_PASSWORD', $PIITOOLS_PASSWORD  -replace 'LICENSE_KEY_VALUE', $((Get-AzureKeyVaultSecret -VaultName $VAULT -Name LicenseKey).SecretValueText)) | Set-Content -Path ./_virlase006_sampleApp/pii-tools-deployment-$NAMESPACE.yaml
+((Get-Content -path ./_virlase006_sampleApp/pii-tools-deployment.yaml -Raw) -replace 'USER_DEFINED_USERNAME', $PIITOOLS_USERNAME -replace 'USER_DEFINED_PASSWORD', $PIITOOLS_PASSWORD  -replace 'LICENSE_KEY_VALUE', $((Get-AzureKeyVaultSecret -VaultName $VAULT -Name LicenseKey).SecretValueText)) | Set-Content -Path ./_virlase006_sampleApp/pii-tools-deployment-$NAMESPACE.yaml
 
 
 
