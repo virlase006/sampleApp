@@ -10,7 +10,9 @@ $NAMESPACE,
 $VAULT,
 $PIITOOLS_USERNAME,
 $PIITOOLS_PASSWORD,
-$DNSNAME)
+$DNSNAME,
+$SUBSCRIPTIONID,
+$RELEASE_PRIMARYARTIFACTSOURCEALIAS)
 $securePassword = ConvertTo-SecureString -String $PASSWORD -AsPlainText -Force
 $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $USERNAME, $securePassword
 ls
@@ -46,7 +48,7 @@ Write-Host "Cluster created"  #>
 #>
  
 #az aks create --resource-group $RESOURCEGROUP --name $CLUSTERNAME --node-count 2 --enable-addons monitoring --l eastus -s Standard_D4s_v3 
-az aks get-credentials --resource-group $RESOURCEGROUP --name $CLUSTERNAME --subscription 0658c1e6-74c9-4311-8207-62c4b33c5f10
+az aks get-credentials --resource-group $RESOURCEGROUP --name $CLUSTERNAME --subscription $SUBSCRIPTIONID
 Write-Host "Fetched credentials" 
 choco install kubernetes-cli
 Write-Host $([Environment]::GetEnvironmentVariable('path', 'machine'))
@@ -109,12 +111,12 @@ Write-Host $IP
 #add hardening for infinite loop
 
 # Get the resource-id of the public ip
-$PUBLICIPID = $(az network public-ip list --query "[?ipAddress!=null]|[?contains(ipAddress, '$IP')].[id]" --output tsv --subscription 0658c1e6-74c9-4311-8207-62c4b33c5f10)
+$PUBLICIPID = $(az network public-ip list --query "[?ipAddress!=null]|[?contains(ipAddress, '$IP')].[id]" --output tsv --subscription $SUBSCRIPTIONID)
 Write-Host "public ip for service is " 
 Write-Host $PUBLICIPID 
 Write-Host $DNSNAME
 # Update public ip address with DNS name
-az network public-ip update --ids $PUBLICIPID --dns-name $DNSNAME --subscription 0658c1e6-74c9-4311-8207-62c4b33c5f10
+az network public-ip update --ids $PUBLICIPID --dns-name $DNSNAME --subscription $SUBSCRIPTIONID
 
 ((Get-Content -path ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/piitools-ingress-cert.yaml -Raw ) -replace 'TLS_CRT', $((Get-AzureKeyVaultSecret -VaultName $VAULT -Name base64crt).SecretValueText -replace '\n' , '')  -replace 'TLS_KEY' , $((Get-AzureKeyVaultSecret -VaultName $VAULT  -Name base64key).SecretValueText).Trim() -replace '\n' , '') |Set-Content -Path ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/secret.yaml
 kubectl apply -f ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/secret.yaml -n $NAMESPACE
