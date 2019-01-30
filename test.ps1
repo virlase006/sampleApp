@@ -99,7 +99,9 @@ Set-Variable -Name "IP" -Value $(kubectl get svc nginx-ingress --template="{{ran
 
 $CheckUser = 0
 while($IP -eq $null){
-if($CheckUser -le '20'){
+if($CheckUser -le '50'){
+  Write-Host "public ip " 
+  Write-Host $IP
   $CheckUser++
   start-sleep -s 10
   $IP = kubectl get svc nginx-ingress --template="{{range.status.loadBalancer.ingress}}{{.ip}}{{end}}" -n $NAMESPACE
