@@ -111,7 +111,7 @@ if($CheckUser -le '20'){
 $PUBLICIPID = az network public-ip list --query "[?ipAddress!=null]|[?contains(ipAddress, '$IP')].[id]" --output tsv
 Write-Host "public ip for service is " 
 Write-Host $PUBLICIP
-Write-Host $DNSNAME"
+Write-Host $DNSNAME
 # Update public ip address with DNS name
 az network public-ip update --ids $PUBLICIPID --dns-name $DNSNAME
 
