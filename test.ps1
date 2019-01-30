@@ -9,7 +9,8 @@ $CLUSTERNAME,
 $NAMESPACE,
 $VAULT,
 $PIITOOLS_USERNAME,
-$PIITOOLS_PASSWORD)
+$PIITOOLS_PASSWORD,
+$DNANAME)
 $securePassword = ConvertTo-SecureString -String $PASSWORD -AsPlainText -Force
 $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $USERNAME, $securePassword
 ls
