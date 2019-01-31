@@ -1,7 +1,3 @@
-#Write-Host "Enter Username & password to connect to Azure:"
-#$USERNAME =-Host
-#[System.Security.SecureString]$secureStringPassword = Read-Host -AsSecureString; 
-#[String]$PASSWORD = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureStringPassword));
 Param($PASSWORD,
 $USERNAME,
 $RESOURCEGROUP,
@@ -16,39 +12,16 @@ $SOURCEFOLDERNAME
 )
 $securePassword = ConvertTo-SecureString -String $PASSWORD -AsPlainText -Force
 $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $USERNAME, $securePassword
-ls
+
 az login -u $USERNAME -p $PASSWORD
 
-#Write-Host "Enter Resource Group name to create:"
-#$RESOURCEGROUP = Read-Host
-
-#Write-Host "Enter Cluster name:"
-#$CLUSTERNAME = Read-Host
-
-#Write-Host "Enter Namespace:"
-#$NAMESPACE = Read-Host
-
-# Name to associate with public IP address
-#Write-Host "Enter domain name to use:"
-#$DNSNAME = Read-Host
-
-<# 
-
-$RESOURCEGROUP = "resgrouppii"
-$CLUSTERNAME = "clusterpii"
-$NAMESPACE = "namespacepii"
-$DNSNAME = "tituspii"
 az group create --name $RESOURCEGROUP --location eastus
 Write-Host "Resource Group created"
 
 Write-Host "Cluster creation in progress... this may take few minutes..."
 az aks create --resource-group $RESOURCEGROUP --name $CLUSTERNAME --node-count 2 --enable-addons monitoring --l eastus -s Standard_D4s_v3
-Write-Host "Cluster created"  #>  
-<# 
--------------------add a check to look at the status of cluster creation before moving further-------------
-#>
- 
-#az aks create --resource-group $RESOURCEGROUP --name $CLUSTERNAME --node-count 2 --enable-addons monitoring --l eastus -s Standard_D4s_v3 
+Write-Host "Cluster created"  
+
 az aks get-credentials --resource-group $RESOURCEGROUP --name $CLUSTERNAME --subscription $SUBSCRIPTIONID
 Write-Host "Fetched credentials" 
 choco install kubernetes-cli
