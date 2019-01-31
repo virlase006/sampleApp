@@ -15,11 +15,11 @@ $credentials = New-Object -TypeName System.Management.Automation.PSCredential -A
 
 az login -u $USERNAME -p $PASSWORD
 
-#az group create --name $RESOURCEGROUP --location eastus --subscription $SUBSCRIPTIONID
+az group create --name $RESOURCEGROUP --location eastus --subscription $SUBSCRIPTIONID
 Write-Host "Resource Group created"
 
 Write-Host "Cluster creation in progress... this may take few minutes..."
-#az aks create --resource-group $RESOURCEGROUP --name $CLUSTERNAME --node-count 2 --enable-addons monitoring --l eastus -s Standard_D4s_v3 --generate-ssh-keys  --subscription $SUBSCRIPTIONID
+az aks create --resource-group $RESOURCEGROUP --name $CLUSTERNAME --node-count 2 --enable-addons monitoring --l eastus -s Standard_D4s_v3 --generate-ssh-keys  --subscription $SUBSCRIPTIONID
 Write-Host "Cluster created"  
 
 az aks get-credentials --resource-group $RESOURCEGROUP --name $CLUSTERNAME --subscription $SUBSCRIPTIONID
