@@ -12,7 +12,7 @@ $PIITOOLS_USERNAME,
 $PIITOOLS_PASSWORD,
 $DNSNAME,
 $SUBSCRIPTIONID,
-$RELEASE_PRIMARYARTIFACTSOURCEALIAS)
+$Release.PrimaryArtifactSourceAlias)
 $securePassword = ConvertTo-SecureString -String $PASSWORD -AsPlainText -Force
 $credentials = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $USERNAME, $securePassword
 ls
@@ -54,10 +54,10 @@ choco install kubernetes-cli
 Write-Host $([Environment]::GetEnvironmentVariable('path', 'machine'))
 kubectl create namespace $NAMESPACE
 
-kubectl apply -f ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/configMap.yaml -n $NAMESPACE
-kubectl apply -f ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/persistentVol.yaml -n $NAMESPACE
-kubectl apply -f ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/postgres-service.yaml -n $NAMESPACE
-kubectl apply -f ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/postgres-deployment.yaml -n $NAMESPACE
+kubectl apply -f ./$Release.PrimaryArtifactSourceAlias/configMap.yaml -n $NAMESPACE
+kubectl apply -f ./$Release.PrimaryArtifactSourceAlias/persistentVol.yaml -n $NAMESPACE
+kubectl apply -f ./$Release.PrimaryArtifactSourceAlias/postgres-service.yaml -n $NAMESPACE
+kubectl apply -f ./$Release.PrimaryArtifactSourceAlias/postgres-deployment.yaml -n $NAMESPACE
 Write-Host "Postgres deployed"
 
 Write-Host "Connecting to azure RM account to gain access to azure key vault:"
@@ -71,12 +71,12 @@ $DockerPassword = (((Get-AzureKeyVaultSecret -VaultName $VAULT -Name DockerPassw
 kubectl create secret docker-registry regcred --docker-server=registry.rare-technologies.com:5050 --docker-username=$DockerUserName --docker-password=$DockerPassword -n $NAMESPACE
 
 
-kubectl apply -f ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/pii-tools-service.yaml -n $NAMESPACE
-((Get-Content -path ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/pii-tools-deployment.yaml -Raw) -replace 'USER_DEFINED_USERNAME', $PIITOOLS_USERNAME -replace 'USER_DEFINED_PASSWORD', $PIITOOLS_PASSWORD  -replace 'LICENSE_KEY_VALUE', $((Get-AzureKeyVaultSecret -VaultName $VAULT -Name LicenseKey).SecretValueText)) | Set-Content -Path ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/pii-tools-deployment-$NAMESPACE.yaml
+kubectl apply -f ./$Release.PrimaryArtifactSourceAlias/pii-tools-service.yaml -n $NAMESPACE
+((Get-Content -path ./$Release.PrimaryArtifactSourceAlias/pii-tools-deployment.yaml -Raw) -replace 'USER_DEFINED_USERNAME', $PIITOOLS_USERNAME -replace 'USER_DEFINED_PASSWORD', $PIITOOLS_PASSWORD  -replace 'LICENSE_KEY_VALUE', $((Get-AzureKeyVaultSecret -VaultName $VAULT -Name LicenseKey).SecretValueText)) | Set-Content -Path ./$Release.PrimaryArtifactSourceAlias/pii-tools-deployment-$NAMESPACE.yaml
 
 
 
-kubectl apply -f ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/pii-tools-deployment-$NAMESPACE.yaml -n $NAMESPACE
+kubectl apply -f ./$Release.PrimaryArtifactSourceAlias/pii-tools-deployment-$NAMESPACE.yaml -n $NAMESPACE
 
 kubectl rollout status deployment/pii-tools -n $NAMESPACE -v9
 $STATUS = $?
@@ -92,10 +92,10 @@ az group delete -n $RESOURCEGROUP  --yes # you can use --no-wait option if you d
 else{
 Write-Host "PII Tools service deployed"
  
-kubectl apply -f ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/ns-and-sa.yaml -n $NAMESPACE
+kubectl apply -f ./$Release.PrimaryArtifactSourceAlias/ns-and-sa.yaml -n $NAMESPACE
 Write-Host "Created service-account"
 
-kubectl apply -f ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/loadbalancer.yaml -n $NAMESPACE
+kubectl apply -f ./$Release.PrimaryArtifactSourceAlias/loadbalancer.yaml -n $NAMESPACE
 
 Set-Variable -Name "IP" -Value $(kubectl get svc nginx-ingress --template="{{range .status.loadBalancer.ingress}}{{.ip}}{{end}}" -n $NAMESPACE)
 
@@ -118,28 +118,29 @@ Write-Host $DNSNAME
 # Update public ip address with DNS name
 az network public-ip update --ids $PUBLICIPID --dns-name $DNSNAME --subscription $SUBSCRIPTIONID
 
-((Get-Content -path ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/piitools-ingress-cert.yaml -Raw ) -replace 'TLS_CRT', $((Get-AzureKeyVaultSecret -VaultName $VAULT -Name base64crt).SecretValueText -replace '\n' , '')  -replace 'TLS_KEY' , $((Get-AzureKeyVaultSecret -VaultName $VAULT  -Name base64key).SecretValueText).Trim() -replace '\n' , '') |Set-Content -Path ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/secret.yaml
-kubectl apply -f ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/secret.yaml -n $NAMESPACE
+((Get-Content -path ./$Release.PrimaryArtifactSourceAlias/piitools-ingress-cert.yaml -Raw ) -replace 'TLS_CRT', $((Get-AzureKeyVaultSecret -VaultName $VAULT -Name base64crt).SecretValueText -replace '\n' , '')  -replace 'TLS_KEY' , $((Get-AzureKeyVaultSecret -VaultName $VAULT  -Name base64key).SecretValueText).Trim() -replace '\n' , '') |Set-Content -Path ./$Release.PrimaryArtifactSourceAlias/secret.yaml
+kubectl apply -f ./$Release.PrimaryArtifactSourceAlias/secret.yaml -n $NAMESPACE
 
 #Create a config map for customizing NGINX configuration
-kubectl apply -f ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/nginx-config.yaml -n $NAMESPACE
+kubectl apply -f ./$Release.PrimaryArtifactSourceAlias/nginx-config.yaml -n $NAMESPACE
 Write-Host "Deployed nginx-config"
 
 #If RBAC is enabled in your cluster, create a cluster role and bind it to the service account
-((Get-Content -path ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/rbac.yaml -Raw) -replace 'USER_DEFINED_NAMESPACE', $NAMESPACE) | Set-Content -Path ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/rbac-$NAMESPACE.yaml
-kubectl apply -f ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/rbac-$NAMESPACE.yaml -n $NAMESPACE
+((Get-Content -path ./$Release.PrimaryArtifactSourceAlias/rbac.yaml -Raw) -replace 'USER_DEFINED_NAMESPACE', $NAMESPACE) | Set-Content -Path ./$Release.PrimaryArtifactSourceAlias/rbac-$NAMESPACE.yaml
+kubectl apply -f ./$Release.PrimaryArtifactSourceAlias/rbac-$NAMESPACE.yaml -n $NAMESPACE
 Write-Host "Deployed rbac"
 
+kubectl apply -f ./$Release.PrimaryArtifactSourceAlias/nginx-ingress.yaml -n $NAMESPACE
 #Deploy the Ingress Controller
 Write-Host "Deployed nginx-ingress"
 
 #Deploy the Ingress 
-((Get-Content -path ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/ingress.yaml -Raw) -replace 'USER_DEFINED_DOMAIN', $DNSNAME) | Set-Content -Path ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/ingress-$DNSNAME.yaml
-kubectl apply -f ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/ingress-$DNSNAME.yaml -n $NAMESPACE
+((Get-Content -path ./$Release.PrimaryArtifactSourceAlias/ingress.yaml -Raw) -replace 'USER_DEFINED_DOMAIN', $DNSNAME) | Set-Content -Path ./$Release.PrimaryArtifactSourceAlias/ingress-$DNSNAME.yaml
+kubectl apply -f ./$Release.PrimaryArtifactSourceAlias/ingress-$DNSNAME.yaml -n $NAMESPACE
 Write-Host "Deployed ingress"
 Write-Host "This may take few minutes, wait for sometime before accessing the URL..."
 } 
 #delete sensitive files
 
-Remove-Item -path ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/secret.yaml
-Remove-Item -path ./$RELEASE_PRIMARYARTIFACTSOURCEALIAS/pii-tools-deployment-$NAMESPACE.yaml
+Remove-Item -path ./$Release.PrimaryArtifactSourceAlias/secret.yaml
+Remove-Item -path ./$Release.PrimaryArtifactSourceAlias/pii-tools-deployment-$NAMESPACE.yaml
