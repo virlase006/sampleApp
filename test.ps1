@@ -36,7 +36,7 @@ Write-Host "Postgres deployed"
 
 Write-Host "Connecting to azure RM account to gain access to azure key vault:"
 Import-Module AzureRM
-Login-AzureRMAccount -Credential $credentials
+Login-AzureRMAccount -Credential $credentials -Subscription $SUBSCRIPTIONID
 
 
 $DockerUserName = (((Get-AzureKeyVaultSecret -VaultName $VAULT -Name DockerUserName).SecretValueText) -replace '\n' ,'')
